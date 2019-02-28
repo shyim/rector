@@ -56,7 +56,8 @@
             "Rector\\PhpParser\\": "packages/PhpParser/src",
             "Rector\\Doctrine\\": "packages/Doctrine/src",
             "Rector\\FileSystemRector\\": "packages/FileSystemRector/src",
-            "Rector\\ContributorTools\\": "packages/ContributorTools/src"
+            "Rector\\ContributorTools\\": "packages/ContributorTools/src",
+            "Rector\\Spagetti\\": "packages/Spagetti/src"
         }
     },
     "autoload-dev": {
@@ -84,7 +85,8 @@
             "Rector\\Twig\\Tests\\": "packages/Twig/tests",
             "Rector\\MysqlToMysqli\\Tests\\": "packages/MysqlToMysqli/tests",
             "Rector\\Doctrine\\Tests\\": "packages/Doctrine/tests",
-            "Rector\\PHPStanExtensions\\": "utils/PHPStanExtensions/src"
+            "Rector\\PHPStanExtensions\\": "utils/PHPStanExtensions/src",
+            "Rector\\Spagetti\\Tests\\": "packages/Spagetti/tests"
         },
         "classmap": [
             "examples",
