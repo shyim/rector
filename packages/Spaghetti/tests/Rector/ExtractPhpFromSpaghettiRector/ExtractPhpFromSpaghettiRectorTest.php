@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Rector\Spagetti\Tests\Rector\ExtraPhpFromSpagettiRector;
+namespace Rector\Spaghetti\Tests\Rector\ExtractPhpFromSpaghettiRector;
 
 use Iterator;
 use Rector\FileSystemRector\FileSystemFileProcessor;
@@ -10,9 +10,9 @@ use Symplify\PackageBuilder\FileSystem\SmartFileInfo;
 use Symplify\PackageBuilder\Tests\AbstractKernelTestCase;
 
 /**
- * @covers \Rector\Spagetti\Rector\ExtraPhpFromSpagettiRector
+ * @covers \Rector\Spaghetti\Rector\ExtractPhpFromSpaghettiRector
  */
-final class MultipleClassFileToPsr4ClassesRectorTest extends AbstractKernelTestCase
+final class ExtractPhpFromSpaghettiRectorTest extends AbstractKernelTestCase
 {
     /**
      * @var FileSystemFileProcessor

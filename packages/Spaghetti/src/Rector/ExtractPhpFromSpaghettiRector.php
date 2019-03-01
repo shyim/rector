@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Rector\Spagetti\Rector;
+namespace Rector\Spaghetti\Rector;
 
 use PhpParser\Lexer;
 use PhpParser\Node\Expr\Variable;
@@ -14,7 +14,7 @@ use Rector\RectorDefinition\RectorDefinition;
 use Symfony\Component\Filesystem\Filesystem;
 use Symplify\PackageBuilder\FileSystem\SmartFileInfo;
 
-final class ExtraPhpFromSpagettiRector implements FileSystemRectorInterface
+final class ExtractPhpFromSpaghettiRector implements FileSystemRectorInterface
 {
     /**
      * @var Parser

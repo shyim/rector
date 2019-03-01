@@ -57,7 +57,7 @@
             "Rector\\Doctrine\\": "packages/Doctrine/src",
             "Rector\\FileSystemRector\\": "packages/FileSystemRector/src",
             "Rector\\ContributorTools\\": "packages/ContributorTools/src",
-            "Rector\\Spagetti\\": "packages/Spagetti/src"
+            "Rector\\Spaghetti\\": "packages/Spaghetti/src"
         }
     },
     "autoload-dev": {
@@ -86,7 +86,7 @@
             "Rector\\MysqlToMysqli\\Tests\\": "packages/MysqlToMysqli/tests",
             "Rector\\Doctrine\\Tests\\": "packages/Doctrine/tests",
             "Rector\\PHPStanExtensions\\": "utils/PHPStanExtensions/src",
-            "Rector\\Spagetti\\Tests\\": "packages/Spagetti/tests"
+            "Rector\\Spaghetti\\Tests\\": "packages/Spaghetti/tests"
         },
         "classmap": [
             "examples",
