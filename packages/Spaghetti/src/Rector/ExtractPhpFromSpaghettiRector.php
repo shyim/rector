@@ -2,18 +2,11 @@
 
 namespace Rector\Spaghetti\Rector;
 
-use PhpParser\Lexer;
-use PhpParser\Node;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\Echo_;
 use PhpParser\Node\Stmt\InlineHTML;
-use Rector\FileSystemRector\Contract\FileSystemRectorInterface;
 use Rector\FileSystemRector\Rector\AbstractFileSystemRector;
-use Rector\NodeTypeResolver\NodeScopeAndMetadataDecorator;
-use Rector\PhpParser\Parser\Parser;
-use Rector\PhpParser\Printer\FormatPerservingPrinter;
 use Rector\RectorDefinition\RectorDefinition;
-use Symfony\Component\Filesystem\Filesystem;
 use Symplify\PackageBuilder\FileSystem\SmartFileInfo;
 
 final class ExtractPhpFromSpaghettiRector extends AbstractFileSystemRector
@@ -54,7 +47,7 @@ final class ExtractPhpFromSpaghettiRector extends AbstractFileSystemRector
 
         // print file
         $fileDestination = $this->createControllerFileDestination($smartFileInfo);
-        $fileContent = $this->printNodesToFilePath($nodes, $fileDestination);
+        $this->printNodesToFilePath($nodes, $fileDestination);
     }
 
     public function getDefinition(): RectorDefinition

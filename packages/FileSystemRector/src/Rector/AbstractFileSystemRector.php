@@ -52,7 +52,7 @@ abstract class AbstractFileSystemRector implements FileSystemRectorInterface
         FormatPerservingPrinter $formatPerservingPrinter,
         Filesystem $filesystem,
         NodeScopeAndMetadataDecorator $nodeScopeAndMetadataDecorator
-    ) {
+    ): void {
         $this->parser = $parser;
         $this->lexer = $lexer;
         $this->formatPerservingPrinter = $formatPerservingPrinter;
@@ -60,7 +60,10 @@ abstract class AbstractFileSystemRector implements FileSystemRectorInterface
         $this->filesystem = $filesystem;
     }
 
-    protected function parseFileInfoToNodes(SmartFileInfo $smartFileInfo)
+    /**
+     * @return Node[]
+     */
+    protected function parseFileInfoToNodes(SmartFileInfo $smartFileInfo): array
     {
         $oldStmts = $this->parser->parseFile($smartFileInfo->getRealPath());
         $this->oldStmts = $oldStmts;
@@ -75,9 +78,9 @@ abstract class AbstractFileSystemRector implements FileSystemRectorInterface
     /**
      * @param Node[] $nodes
      */
-    protected function printNodesToFilePath(array $nodes, string $fileDestination): string
+    protected function printNodesToFilePath(array $nodes, string $fileDestination): void
     {
-         $fileContent = $this->formatPerservingPrinter->printToString(
+        $fileContent = $this->formatPerservingPrinter->printToString(
             $nodes,
             $this->oldStmts,
             $this->lexer->getTokens()
