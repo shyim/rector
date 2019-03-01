@@ -3,10 +3,12 @@
 namespace Rector\Spaghetti\Rector;
 
 use PhpParser\Lexer;
+use PhpParser\Node;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\Echo_;
 use PhpParser\Node\Stmt\InlineHTML;
 use Rector\FileSystemRector\Contract\FileSystemRectorInterface;
+use Rector\FileSystemRector\Rector\AbstractFileSystemRector;
 use Rector\NodeTypeResolver\NodeScopeAndMetadataDecorator;
 use Rector\PhpParser\Parser\Parser;
 use Rector\PhpParser\Printer\FormatPerservingPrinter;
@@ -14,80 +16,34 @@ use Rector\RectorDefinition\RectorDefinition;
 use Symfony\Component\Filesystem\Filesystem;
 use Symplify\PackageBuilder\FileSystem\SmartFileInfo;
 
-final class ExtractPhpFromSpaghettiRector implements FileSystemRectorInterface
+final class ExtractPhpFromSpaghettiRector extends AbstractFileSystemRector
 {
-    /**
-     * @var Parser
-     */
-    private $parser;
-
-    /**
-     * @var Lexer
-     */
-    private $lexer;
-
-    /**
-     * @var FormatPerservingPrinter
-     */
-    private $formatPerservingPrinter;
-
-    /**
-     * @var NodeScopeAndMetadataDecorator
-     */
-    private $nodeScopeAndMetadataDecorator;
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
-
-    public function __construct(
-        Parser $parser,
-        Lexer $lexer,
-        FormatPerservingPrinter $formatPerservingPrinter,
-        Filesystem $filesystem,
-        NodeScopeAndMetadataDecorator $nodeScopeAndMetadataDecorator
-    ) {
-        $this->parser = $parser;
-        $this->lexer = $lexer;
-        $this->formatPerservingPrinter = $formatPerservingPrinter;
-        $this->nodeScopeAndMetadataDecorator = $nodeScopeAndMetadataDecorator;
-        $this->filesystem = $filesystem;
-    }
-
     public function refactor(SmartFileInfo $smartFileInfo): void
     {
-        $oldStmts = $this->parser->parseFile($smartFileInfo->getRealPath());
-
-        // needed for format preserving
-        $newStmts = $this->nodeScopeAndMetadataDecorator->decorateNodesFromFile(
-            $oldStmts,
-            $smartFileInfo->getRealPath()
-        );
+        $nodes = $this->parseFileInfoToNodes($smartFileInfo);
 
         // analyze here! - collect variables
-
         $variables = [];
 
         $i = 0;
-        foreach ($newStmts as $stmt) {
-            if ($stmt instanceof InlineHTML) {
+        foreach ($nodes as $node) {
+            if ($node instanceof InlineHTML) {
                 continue;
             }
 
-            if ($stmt instanceof Echo_) {
-                if (count($stmt->exprs) === 1) {
+            if ($node instanceof Echo_) {
+                if (count($node->exprs) === 1) {
                     // it is already variable, nothing to change
-                    if ($stmt->exprs[0] instanceof Variable) {
+                    if ($node->exprs[0] instanceof Variable) {
                         continue;
                     }
 
                     ++$i;
 
                     $variableName = 'variable' . $i;
-                    $variables[$variableName] = $stmt->exprs[0];
+                    $variables[$variableName] = $node->exprs[0];
 
-                    $stmt->exprs[0] = new Variable($variableName);
+                    $node->exprs[0] = new Variable($variableName);
                 }
             }
         }
@@ -98,14 +54,7 @@ final class ExtractPhpFromSpaghettiRector implements FileSystemRectorInterface
 
         // print file
         $fileDestination = $this->createControllerFileDestination($smartFileInfo);
-
-        $fileContent = $this->formatPerservingPrinter->printToString(
-            $newStmts,
-            $oldStmts,
-            $this->lexer->getTokens()
-        );
-
-        $this->filesystem->dumpFile($fileDestination, $fileContent);
+        $fileContent = $this->printNodesToFilePath($nodes, $fileDestination);
     }
 
     public function getDefinition(): RectorDefinition
