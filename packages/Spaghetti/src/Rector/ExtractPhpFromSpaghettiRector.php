@@ -2,15 +2,32 @@
 
 namespace Rector\Spaghetti\Rector;
 
+use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Echo_;
+use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\InlineHTML;
 use Rector\FileSystemRector\Rector\AbstractFileSystemRector;
+use Rector\PhpParser\Node\NodeFactory;
 use Rector\RectorDefinition\RectorDefinition;
 use Symplify\PackageBuilder\FileSystem\SmartFileInfo;
 
 final class ExtractPhpFromSpaghettiRector extends AbstractFileSystemRector
 {
+    /**
+     * @var NodeFactory
+     */
+    private $nodeFactory;
+
+    public function __construct(NodeFactory $nodeFactory)
+    {
+        $this->nodeFactory = $nodeFactory;
+    }
+
     public function refactor(SmartFileInfo $smartFileInfo): void
     {
         $nodes = $this->parseFileInfoToNodes($smartFileInfo);
@@ -21,6 +38,7 @@ final class ExtractPhpFromSpaghettiRector extends AbstractFileSystemRector
         $i = 0;
         foreach ($nodes as $node) {
             if ($node instanceof InlineHTML) {
+                // @todo are we in a for/foreach?
                 continue;
             }
 
@@ -43,11 +61,27 @@ final class ExtractPhpFromSpaghettiRector extends AbstractFileSystemRector
 
         // create Controller here
         dump($variables);
-        die;
 
-        // print file
+        $controllerName = $this->createControllerName($smartFileInfo);
+        $classController = new Class_($controllerName);
+
+        $renderMethod = new ClassMethod('render');
+        $renderMethod->flags |= Class_::MODIFIER_PUBLIC;
+
+        foreach ($variables as $name => $expr) {
+            $renderMethod->stmts[] = new Assign(new Variable($name), $expr);
+        }
+
+        $include = new Include_(new String_('some_file'), Include_::TYPE_REQUIRE_ONCE);
+        $renderMethod->stmts[] = new Expression($include);
+
+        // include file
+//        $renderMethod->stmts[] = new Include_();
+        $classController->stmts[] = $renderMethod;
+
+        // print controller
         $fileDestination = $this->createControllerFileDestination($smartFileInfo);
-        $this->printNodesToFilePath($nodes, $fileDestination);
+        $this->printNodesToFilePath([$classController], $fileDestination);
     }
 
     public function getDefinition(): RectorDefinition
@@ -61,5 +95,10 @@ final class ExtractPhpFromSpaghettiRector extends AbstractFileSystemRector
         return $currentDirectory . DIRECTORY_SEPARATOR . ucfirst(
             $smartFileInfo->getBasenameWithoutSuffix()
         ) . 'Controller.php';
+    }
+
+    private function createControllerName(SmartFileInfo $smartFileInfo): string
+    {
+        return ucfirst($smartFileInfo->getBasenameWithoutSuffix()) . 'Controller';
     }
 }
