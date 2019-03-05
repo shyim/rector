@@ -12,6 +12,11 @@ function getAndSetToMethodCall()
     if ($container->someService) {
 
     }
+
+    /*
+     * @deprecated Will be removed someone
+     */
+    $container->RandomFunction = RandomFunction();
 }
 
 ?>
@@ -30,6 +35,16 @@ function getAndSetToMethodCall()
     if ($container->getService('someService')) {
 
     }
+
+    /*
+     * @deprecated Will be removed someone
+     */
+    $container->addService('RandomFunction', RandomFunction());
+}
+
+function RandomFunction()
+{
+
 }
 
 ?>
